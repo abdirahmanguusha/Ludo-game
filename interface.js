@@ -75,21 +75,21 @@ const setDiceValue = (value) => {
   document.querySelector(".dice-value").innerText = value;
 };
 
-listenDiceClick(callback);
-listenResetClick(callback);
-listenPieceClick(callback);
+// listenDiceClick(callback);
+// listenResetClick(callback);
+// listenPieceClick(callback);
 
-setPiecePosition("P1", 1, 13);
+// setPiecePosition("P1", 1, 13);
 
-setTurn(1);
+// setTurn(1);
 
-disableDice();
+// disableDice();
 
 // enableDice(); // Commented out, enableDice() was already called previously.
 
 // highlightPieces("P1", [0]); // Not defined, commented out.
 
-unhighlightPieces();
+// unhighlightPieces();
 
-setDiceValue(2);
+// setDiceValue(2);
 
