@@ -1,6 +1,7 @@
 //ANCHOR - this part of the  code is coming from  constants.js file
 
 
+
 import {
   BASE_POSITIONS,
   HOME_ENTRANCE,
@@ -10,7 +11,7 @@ import {
   START_POSITIONS,
   STATE,
   TURNING_POINTS,
-} from "./constants";
+} from "./constants.js";
 
 
 //ANCHOR - this part of the  code is coming from  interface.js file
@@ -25,7 +26,7 @@ import {
   highlightPieces,
   unhighlightPieces,
   setDiceValue
- } from "./interface"
+ } from "./interface.js"
 
  
 let currentPositions = {
@@ -124,7 +125,7 @@ function onDiceClick() {
   checkForEligiblePieces();
 }
 
-settingDiceValue(6);
+// settingDiceValue(6);
 
 settingTurn(0);
 getTurn()
@@ -133,4 +134,22 @@ settingState("DICE_NOT_ROLLED")
 onDiceClick()
 getDiceValue();
 
+setPiecePosition("P1", 0, 500)
+setPiecePosition("P1", 1, 501)
+setPiecePosition("P1", 2, 502)
+setPiecePosition("P1", 3, 503)
 
+
+setPiecePosition("P2", 0, 600)
+setPiecePosition("P2", 1, 601)
+setPiecePosition("P2", 2, 602)
+setPiecePosition("P2", 3, 603)
+
+
+enableDice();
+listenDiceClick();
+
+
+export {
+  onDiceClick
+}; 

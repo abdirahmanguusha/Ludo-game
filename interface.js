@@ -1,4 +1,9 @@
+
 import { COORDINATES_MAP, PLAYERS, STEP_LENGTH } from "./constants.js";
+
+import {
+  onDiceClick
+} from "./main.js";
 
 const diceButtonElement = document.querySelector("#dice-btn");
 const playerPiecesElements = {
@@ -11,7 +16,7 @@ const callback = () => {
 };
 
 const listenDiceClick = (callback) => {
-  diceButtonElement.addEventListener("click", callback);
+  diceButtonElement.addEventListener("click", onDiceClick);
 };
 
 const listenResetClick = (callback) => {
@@ -70,6 +75,11 @@ const unhighlightPieces = () => {
     ele.classList.remove("highlight");
   });
 };
+const highlightPieces = () => {
+  // document.querySelectorAll(".player-piece.highlight").forEach((ele) => {
+  //   ele.classList.add("highlight");
+  // });
+};
 
 const setDiceValue = (value) => {
   document.querySelector(".dice-value").innerText = value;
@@ -92,4 +102,15 @@ const setDiceValue = (value) => {
 // unhighlightPieces();
 
 // setDiceValue(2);
-
+export {
+  listenDiceClick,
+  listenResetClick,
+  listenPieceClick,
+  setPiecePosition,
+  setTurn,
+  enableDice,
+  disableDice,
+  highlightPieces,
+  unhighlightPieces,
+  setDiceValue
+ }
