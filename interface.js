@@ -1,35 +1,31 @@
-
 import { COORDINATES_MAP, PLAYERS, STEP_LENGTH } from "./constants.js";
-
-import {
-  onDiceClick
-} from "./main.js";
 
 const diceButtonElement = document.querySelector("#dice-btn");
 const playerPiecesElements = {
   P1: document.querySelectorAll('[player-id="P1"].player-piece'),
   P2: document.querySelectorAll('[player-id="P2"].player-piece'),
 };
+const resetBtn = document.getElementById("reset-btn");
 
 const callback = () => {
   console.log("function");
 };
 
 const listenDiceClick = (callback) => {
-  diceButtonElement.addEventListener("click", onDiceClick);
+  diceButtonElement.addEventListener("click", callback);
 };
 
 const listenResetClick = (callback) => {
-  document.querySelector("#reset-btn").addEventListener("click", callback);
+  resetBtn.addEventListener("click", callback);
 };
 
-const listenPieceClick = (callback) => {
-  document.querySelector(".player-pieces").addEventListener("click", callback);
-};
+// const listenPieceClick = (callback) => {
+//   document.querySelector(".player-pieces").addEventListener("click", callback);
+// };
 
 const setPiecePosition = (player, piece, newPosition) => {
-  console.log(player);
-  console.log("playerPiecesElements", playerPiecesElements);
+  // console.log(player);
+  // console.log("playerPiecesElements", playerPiecesElements);
   if (!playerPiecesElements[player] || !playerPiecesElements[player][piece]) {
     console.error(
       `Player element of given player: ${player} and piece: ${piece} not found`
@@ -38,8 +34,9 @@ const setPiecePosition = (player, piece, newPosition) => {
   }
 
   const [x, y] = COORDINATES_MAP[newPosition];
-  console.log("x", x);
-  console.log("y", y);
+
+  // console.log("x", x);
+  // console.log("y", y);
 
   const pieceElement = playerPiecesElements[player][piece];
   pieceElement.style.top = y * STEP_LENGTH + "%";
@@ -75,15 +72,25 @@ const unhighlightPieces = () => {
     ele.classList.remove("highlight");
   });
 };
-const highlightPieces = () => {
-  // document.querySelectorAll(".player-piece.highlight").forEach((ele) => {
-  //   ele.classList.add("highlight");
-  // });
+const highlightPieces = (player, eligiblePieces) => {
+  eligiblePieces.forEach((piece) => {
+    document
+      .querySelector(`.player-piece[player-id="${player}"][piece="${piece}"]`)
+      .classList.add("highlight");
+  });  
 };
 
 const setDiceValue = (value) => {
   document.querySelector(".dice-value").innerText = value;
 };
+
+function listenPieceClick(callback){
+  document.querySelectorAll(".player-piece.highlight").forEach((el)=>{
+      el.addEventListener("click", callback);
+  })
+
+}
+
 
 // listenDiceClick(callback);
 // listenResetClick(callback);
@@ -112,5 +119,5 @@ export {
   disableDice,
   highlightPieces,
   unhighlightPieces,
-  setDiceValue
- }
+  setDiceValue,
+};
