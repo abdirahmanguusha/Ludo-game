@@ -86,7 +86,7 @@ const setDiceValue = (value) => {
 
 function listenPieceClick(callback){
   document.querySelectorAll(".player-piece.highlight").forEach((el)=>{
-      el.addEventListener("click", callback);
+    el.addEventListener("click", (e) => callback(e) )
   })
 
 }

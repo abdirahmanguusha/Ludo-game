@@ -79,22 +79,17 @@ const changeCurrentPosition = (player, piece, newPosition) => {
 
 function checkForEligiblePieces() {
   const player = PLAYERS[getTurn()];
-  console.log(player);
   const eligiblePieces = getEligiblePieces(player);
-  console.log(eligiblePieces);
-
   if (eligiblePieces.length) {
     highlightPieces(player, eligiblePieces);
     disableDice();
     listenPieceClick(onPieceClick);
   } else {
-    console.log(player, eligiblePieces, typeof player);
     if (player == "P2") settingTurn(0);
     if (player == "P1") settingTurn(1);
   }
   enableDice();
 }
-
 
 function getEligiblePieces(player) {
   return [0, 1, 2, 3].filter((piece) => {
@@ -119,43 +114,64 @@ function getEligiblePieces(player) {
   });
 }
 
-// this code i change from here 
-
-
 function onPieceClick(event) {
-  const target = event.target;
-
-  if (
-    !target.classList.contains("player-piece") ||
-    !target.classList.contains("highlight")
-  ) {
-    return;
-  }
-  console.log("Piece clicked");
-
-  const player = target.getAttribute("player-id");
-  const piece = target.getAttribute("piece");
+  let target = event.target;
+  console.log(target);
+  let player = target.getAttribute("player-id");
+  let piece = target.getAttribute("piece");
   handlePieceClick(player, piece);
 }
 
 function handlePieceClick(player, piece) {
-  console.log(player, piece);
-  const currentPosition = currentPositions[player][piece];
-   // Disable roll button
-   disableDice();
+  let currentPosition = currentPositions[player][piece];
 
   if (BASE_POSITIONS[player].includes(currentPosition)) {
     setPiecePosition(player, piece, START_POSITIONS[player]);
-    setState(STATE.DICE_NOT_ROLLED);
-    enableDice();
+    settingState(STATE.DICE_NOT_ROLLED);
     return;
   }
+  unhighlightPieces();
+  movePiece(player, piece, _diceValue);
+}
 
+function movePiece(player, piece, moveBy) {
+  let intervalId = setInterval(() => {
+    incrementPiecePosition(player, piece);
+    moveBy--;
+
+    if (moveBy === 0) {
+      clearInterval(intervalId);
+      if (hasPlayerWon(player)) {
+        alert(`Player: ${player} has won!`);
+        onResetClick();
+      }
+    }
+  }, 200);
+}
+
+function incrementPiecePosition(player, piece){
+  setPiecePosition(player, piece, getIncrementedPosition(player,piece));
+
+  
+}
+
+function hasPlayerWon(){
+
+  
+}
+
+function getIncrementedPosition(player, piece){
+  let currentPosition = currentPositions[player][piece];
+
+  if(currentPosition === TURNING_POINTS[player]) {
+    return HOME_ENTRANCE[player][0]
+  } else if(currentPosition === 51) {
+    return 0;
+  }
+  return currentPosition+1;
 
 }
 
-
-// change finish here 
 function onDiceClick() {
   // console.log("dice clicked!", Math.random());
   settingDiceValue(1 + Math.floor(Math.random() * 6));
