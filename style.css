@@ -12,8 +12,8 @@ body {
   margin: 20px auto;
   margin-top: 50px;
   background-color: rgb(75, 77, 178);
-  border-radius: 10px; /* Optional: Add border radius for rounded corners */
-  box-shadow: 0 0 20px rgb(0, 0, 0), 0 0 40px rgba(0, 0, 0, 0.2); /* Adjust the values as needed */
+  border-radius: 10px; 
+  box-shadow: 0 0 20px rgb(0, 0, 0), 0 0 40px rgba(0, 0, 0, 0.2); 
 }
 
 .ludo-container .ludo {
