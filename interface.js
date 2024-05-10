@@ -7,10 +7,6 @@ const playerPiecesElements = {
 };
 const resetBtn = document.getElementById("reset-btn");
 
-const callback = () => {
-  console.log("function");
-};
-
 const listenDiceClick = (callback) => {
   diceButtonElement.addEventListener("click", callback);
 };
@@ -19,13 +15,7 @@ const listenResetClick = (callback) => {
   resetBtn.addEventListener("click", callback);
 };
 
-// const listenPieceClick = (callback) => {
-//   document.querySelector(".player-pieces").addEventListener("click", callback);
-// };
-
 const setPiecePosition = (player, piece, newPosition) => {
-  // console.log(player);
-  // console.log("playerPiecesElements", playerPiecesElements);
   if (!playerPiecesElements[player] || !playerPiecesElements[player][piece]) {
     console.error(
       `Player element of given player: ${player} and piece: ${piece} not found`
@@ -34,9 +24,6 @@ const setPiecePosition = (player, piece, newPosition) => {
   }
 
   const [x, y] = COORDINATES_MAP[newPosition];
-
-  // console.log("x", x);
-  // console.log("y", y);
 
   const pieceElement = playerPiecesElements[player][piece];
   pieceElement.style.top = y * STEP_LENGTH + "%";
@@ -77,38 +64,17 @@ const highlightPieces = (player, eligiblePieces) => {
     document
       .querySelector(`.player-piece[player-id="${player}"][piece="${piece}"]`)
       .classList.add("highlight");
-  });  
+  });
 };
 
 const setDiceValue = (value) => {
   document.querySelector(".dice-value").innerText = value;
 };
 
-function listenPieceClick(callback){
-  document.querySelectorAll(".player-piece.highlight").forEach((el)=>{
-    el.addEventListener("click", (e) => callback(e) )
-  })
-
+function listenPieceClick(callback) {
+  document.querySelector(".player-pieces").addEventListener("click", callback);
 }
 
-
-// listenDiceClick(callback);
-// listenResetClick(callback);
-// listenPieceClick(callback);
-
-// setPiecePosition("P1", 1, 13);
-
-// setTurn(1);
-
-// disableDice();
-
-// enableDice(); // Commented out, enableDice() was already called previously.
-
-// highlightPieces("P1", [0]); // Not defined, commented out.
-
-// unhighlightPieces();
-
-// setDiceValue(2);
 export {
   listenDiceClick,
   listenResetClick,

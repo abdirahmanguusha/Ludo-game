@@ -31,33 +31,27 @@ let currentPositions = {
 };
 
 let _diceValue;
-let _turn;
-let _state;
-
 function getDiceValue() {
   return _diceValue;
 }
-
 function settingDiceValue(value) {
   _diceValue = value;
   setDiceValue(value);
 }
 
+let _turn;
 function getTurn() {
-  // console.log("getTurn", _turn);
   return _turn;
 }
-
 function settingTurn(value) {
   _turn = value;
   setTurn(value);
 }
 
+let _state;
 function getState() {
-  console.log("getState", _state);
   return _state;
 }
-
 function settingState(value) {
   _state = value;
   if (value === STATE.DICE_NOT_ROLLED) {
@@ -67,28 +61,35 @@ function settingState(value) {
     disableDice();
   }
 }
-
-function LudolistenDiceClick() {
-  listenDiceClick(this.onDiceClick.bind(this));
+function constructor() {
+  listeningDiceClick();
+  listeningResetClick();
+  listeningPieceClick();
+  resetGame();
 }
+function listeningDiceClick() {
+  listenDiceClick(onDiceClick.bind(this));
+}
+function onDiceClick() {
+  settingDiceValue(1 + Math.floor(Math.random() * 6));
+  settingState(STATE.DICE_ROLLED);
 
-const changeCurrentPosition = (player, piece, newPosition) => {
-  currentPositions[player][piece] = newPosition;
-  setPiecePosition(player, piece, newPosition);
-};
+  checkForEligiblePieces();
+}
 
 function checkForEligiblePieces() {
   const player = PLAYERS[getTurn()];
   const eligiblePieces = getEligiblePieces(player);
   if (eligiblePieces.length) {
     highlightPieces(player, eligiblePieces);
-    disableDice();
-    listenPieceClick(onPieceClick);
   } else {
-    if (player == "P2") settingTurn(0);
-    if (player == "P1") settingTurn(1);
+    incrementTurn();
   }
-  enableDice();
+}
+
+function incrementTurn() {
+  settingTurn(_turn === 0 ? 1 : 0);
+  settingState(STATE.DICE_NOT_ROLLED);
 }
 
 function getEligiblePieces(player) {
@@ -99,13 +100,16 @@ function getEligiblePieces(player) {
       return false;
     }
 
-    if (BASE_POSITIONS[player].includes(currentPosition) && _diceValue !== 6) {
+    if (
+      BASE_POSITIONS[player].includes(currentPosition) &&
+      getDiceValue() !== 6
+    ) {
       return false;
     }
 
     if (
       HOME_ENTRANCE[player].includes(currentPosition) &&
-      _diceValue > HOME_POSITIONS[player] - currentPosition
+      getDiceValue() > HOME_POSITIONS[player] - currentPosition
     ) {
       return false;
     }
@@ -114,9 +118,37 @@ function getEligiblePieces(player) {
   });
 }
 
+function listeningResetClick() {
+  listenResetClick(resetGame);
+}
+
+function resetGame() {
+  currentPositions = structuredClone(BASE_POSITIONS);
+
+  PLAYERS.forEach((player) => {
+    [0, 1, 2, 3].forEach((piece) => {
+      settingPiecePosition(player, piece, currentPositions[player][piece]);
+    });
+  });
+
+  settingTurn(0);
+  settingState(STATE.DICE_NOT_ROLLED);
+}
+
+function listeningPieceClick() {
+  listenPieceClick(onPieceClick);
+}
+
 function onPieceClick(event) {
   let target = event.target;
-  console.log(target);
+
+  if (
+    !target.classList.contains("player-piece") ||
+    !target.classList.contains("highlight")
+  ) {
+    return;
+  }
+
   let player = target.getAttribute("player-id");
   let piece = target.getAttribute("piece");
   handlePieceClick(player, piece);
@@ -126,12 +158,18 @@ function handlePieceClick(player, piece) {
   let currentPosition = currentPositions[player][piece];
 
   if (BASE_POSITIONS[player].includes(currentPosition)) {
-    setPiecePosition(player, piece, START_POSITIONS[player]);
+    settingPiecePosition(player, piece, START_POSITIONS[player]);
     settingState(STATE.DICE_NOT_ROLLED);
     return;
   }
+
   unhighlightPieces();
-  movePiece(player, piece, _diceValue);
+  movePiece(player, piece, getDiceValue());
+}
+
+function settingPiecePosition(player, piece, newPosition) {
+  currentPositions[player][piece] = newPosition;
+  setPiecePosition(player, piece, newPosition);
 }
 
 function movePiece(player, piece, moveBy) {
@@ -143,59 +181,62 @@ function movePiece(player, piece, moveBy) {
       clearInterval(intervalId);
       if (hasPlayerWon(player)) {
         alert(`Player: ${player} has won!`);
-        onResetClick();
+        resetGame();
+        return;
       }
+
+      let isKill = checkForKill(player, piece);
+
+      if (isKill || getDiceValue() === 6) {
+        settingState(STATE.DICE_NOT_ROLLED);
+        return;
+      }
+
+      incrementTurn();
     }
   }, 200);
 }
 
-function incrementPiecePosition(player, piece){
-  setPiecePosition(player, piece, getIncrementedPosition(player,piece));
+function checkForKill(player, piece) {
+  let currentPosition = currentPositions[player][piece];
+  let opponent = player === "P1" ? "P2" : "P1";
 
-  
+  let kill = false;
+
+  [0, 1, 2, 3].forEach((piece) => {
+    let opponentPosition = currentPositions[opponent][piece];
+
+    if (
+      currentPosition === opponentPosition &&
+      !SAFE_POSITIONS.includes(currentPosition)
+    ) {
+      settingPiecePosition(opponent, piece, BASE_POSITIONS[opponent][piece]);
+      kill = true;
+    }
+  });
+
+  return kill;
 }
 
-function hasPlayerWon(){
-
-  
+function hasPlayerWon(player) {
+  return [0, 1, 2, 3].every(
+    (piece) => currentPositions[player][piece] === HOME_POSITIONS[player]
+  );
 }
 
-function getIncrementedPosition(player, piece){
+function incrementPiecePosition(player, piece) {
+  settingPiecePosition(player, piece, getIncrementedPosition(player, piece));
+}
+
+function getIncrementedPosition(player, piece) {
   let currentPosition = currentPositions[player][piece];
 
-  if(currentPosition === TURNING_POINTS[player]) {
-    return HOME_ENTRANCE[player][0]
-  } else if(currentPosition === 51) {
+  if (currentPosition === TURNING_POINTS[player]) {
+    return HOME_ENTRANCE[player][0];
+  } else if (currentPosition === 51) {
     return 0;
   }
-  return currentPosition+1;
-
+  return currentPosition + 1;
 }
 
-function onDiceClick() {
-  // console.log("dice clicked!", Math.random());
-  settingDiceValue(1 + Math.floor(Math.random() * 6));
-  settingState(STATE.DICE_ROLLED);
-
-  checkForEligiblePieces();
-}
-
-function onResetClick() {
-  changeCurrentPosition("P1", 0, 500);
-  changeCurrentPosition("P1", 1, 501);
-  changeCurrentPosition("P1", 2, 502);
-  changeCurrentPosition("P1", 3, 503);
-
-  changeCurrentPosition("P2", 0, 600);
-  changeCurrentPosition("P2", 1, 601);
-  changeCurrentPosition("P2", 2, 602);
-  changeCurrentPosition("P2", 3, 603);
-
-  settingState(STATE.DICE_NOT_ROLLED);
-  settingTurn(0);
-  enableDice();
-  listenDiceClick(onDiceClick);
-}
-
-listenResetClick(onResetClick);
-onResetClick();
+constructor();
